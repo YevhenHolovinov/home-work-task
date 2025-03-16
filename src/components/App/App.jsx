@@ -1,23 +1,35 @@
-import Profile from '../Profile/Profile';
-import FriendList from '../FriendList/FriendList';
-import TransactionHistory from '../TransactionHistory/TransactionHistory';
-
-import userData from '../../data/userData.json';
-import friends from "../../data/friends.json";
-import transaction from "../../data/transaction.json";
+import TaskList from '../TaskList/TaskList';
+import initialTasks from '../../tasks.json';
+import Form from '../Form/Form';
+import Filter from '../Filter/Filter';
+import css from './App.module.css';
+import { useState } from 'react';
 
 export default function App() {
-    return (
-        <>
-            <Profile 
-                name={userData.username}
-				tag={userData.tag}
-				location={userData.location}
-				image={userData.avatar}
-				stats={userData.stats}
-            />
-            <FriendList friends={friends} />
-            <TransactionHistory items={transaction} />
-        </>
-    );
-};
+  const [tasks, setTasks] = useState(initialTasks);
+  const [filter, setFilter] = useState('');
+
+  const addTask = (newTask) => {
+    setTasks((prevTasks) => {
+      return [...prevTasks, newTask];
+    });
+  };
+
+  const deleteTask = (taskId) => {
+    setTasks((prevTasks) => {
+      return prevTasks.filter((task) => task.id !== taskId);
+    });
+  };
+
+  const visibleTasks = tasks.filter((task) =>
+    task.text.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  return (
+    <div className={css.container}>
+      <Form onAdd={addTask} />
+      <Filter value={filter} onFilter={setFilter} />
+      <TaskList tasks={visibleTasks} onDelete={deleteTask} />
+    </div>
+  );
+}
